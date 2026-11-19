@@ -1,6 +1,7 @@
 // Single source of truth for the page and the terminal. Edit here.
+import type { OrbitArc, Profile, Project, StackGroup, VirtualFiles } from '../types';
 
-export const profile = Object.freeze({
+export const profile: Profile = {
   name: 'Jailton Santos',
   user: 'jailton',
   role: 'Desenvolvedor Full-stack',
@@ -11,10 +12,9 @@ export const profile = Object.freeze({
   // TODO: preencha para aparecer em "contato" e no terminal
   linkedin: '',
   linkedinLabel: '',
-  cv: '',
-});
+};
 
-export const projects = Object.freeze([
+export const projects: readonly Project[] = [
   {
     id: 'myworld',
     index: '01',
@@ -51,9 +51,9 @@ export const projects = Object.freeze([
     links: { live: '', repo: 'https://github.com/Jayzmatos22/brasil_panel_utilities-api' },
     visual: 'market',
   },
-]);
+];
 
-export const stack = Object.freeze([
+export const stack: readonly StackGroup[] = [
   {
     group: 'linguagens',
     items: [
@@ -103,16 +103,15 @@ export const stack = Object.freeze([
       ['WebGL', 'myworld'],
     ],
   },
-]);
+];
 
-/** Orbiting labels next to the hero portrait. Angles in degrees, center sits behind the photo. */
-export const arcs = Object.freeze([
+export const arcs: readonly OrbitArc[] = [
   { r: 300, from: -30, to: 30, dot: -14, title: 'Java', label: 'SPRING BOOT · JPA' },
   { r: 360, from: -42, to: 44, dot: 12, title: 'Python', label: 'FASTAPI · PYDANTIC' },
   { r: 420, from: -50, to: 52, dot: 36, title: 'AWS', label: 'LAMBDA · DYNAMODB' },
-]);
+];
 
-export const files = Object.freeze({
+export const files: VirtualFiles = {
   'sobre.md': [
     '# sobre',
     '',
@@ -128,4 +127,4 @@ export const files = Object.freeze({
     'se você chegou até aqui, a gente provavelmente deveria conversar.',
     '→ contato',
   ],
-});
+};
