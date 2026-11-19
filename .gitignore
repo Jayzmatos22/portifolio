@@ -1,0 +1,8 @@
+# Configuração local do editor/agente
+.claude/
+.vscode/
+.idea/
+
+# Sistema
+Thumbs.db
+.DS_Store
