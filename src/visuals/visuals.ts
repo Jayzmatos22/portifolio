@@ -1,22 +1,47 @@
-// Live canvases inside the project windows: a black hole (MyWorld) and a market chart
-// with a request log (Brasil Panel). Each only runs while visible.
-import { onFrame, clamp, lerp, prefersReducedMotion, watchVisibility } from './core.js';
-import { getAccent } from './theme.js';
+// Live canvases inside the project windows: a black hole (MyWorld) and a market chart with
+// a request log (Brasil Panel). Each only runs while visible.
+import { prefersReducedMotion, watchVisibility } from '../lib/dom';
+import { clamp, lerp } from '../lib/math';
+import { getAccent } from '../lib/theme';
+import { onFrame } from '../lib/ticker';
+import type { VisualKind } from '../types';
 
 const TAU = Math.PI * 2;
 
-function fitCanvas(canvas) {
+interface CanvasSize {
+  readonly ctx: CanvasRenderingContext2D;
+  readonly w: number;
+  readonly h: number;
+}
+
+interface LocalPointer {
+  x: number;
+  y: number;
+  tx: number;
+  ty: number;
+  inside: boolean;
+}
+
+interface Scene {
+  draw(size: CanvasSize, pointer: LocalPointer, time: number, dt: number): void;
+  setActive?(active: boolean): void;
+}
+
+type SceneFactory = (host: HTMLElement) => Scene;
+
+function fitCanvas(canvas: HTMLCanvasElement): CanvasSize {
   const rect = canvas.getBoundingClientRect();
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   canvas.width = Math.max(1, Math.round(rect.width * dpr));
   canvas.height = Math.max(1, Math.round(rect.height * dpr));
   const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('2d canvas unavailable');
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   return { ctx, w: rect.width, h: rect.height };
 }
 
-function trackPointer(el) {
-  const p = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5, inside: false };
+function trackPointer(el: HTMLElement): LocalPointer {
+  const p: LocalPointer = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5, inside: false };
   el.addEventListener('pointermove', (e) => {
     const r = el.getBoundingClientRect();
     p.tx = clamp((e.clientX - r.left) / r.width);
@@ -31,15 +56,15 @@ function trackPointer(el) {
   return p;
 }
 
-function mountScene(host, createScene) {
-  const canvas = host.querySelector('canvas');
+function mountScene(host: HTMLElement, createScene: SceneFactory): void {
+  const canvas = host.querySelector<HTMLCanvasElement>('canvas');
   if (!canvas) return;
   let size = fitCanvas(canvas);
-  const pointer = trackPointer(host.closest('[data-spotlight]') || host);
-  const scene = createScene(size, host);
+  const pointer = trackPointer(host.closest<HTMLElement>('[data-spotlight]') ?? host);
+  const scene = createScene(host);
+  const reduceMotion = prefersReducedMotion();
   let visible = false;
   let time = 0;
-  const reduceMotion = prefersReducedMotion();
 
   new ResizeObserver(() => {
     size = fitCanvas(canvas);
@@ -63,15 +88,31 @@ function mountScene(host, createScene) {
   });
 }
 
-/* MyWorld: black hole with accretion disk + starfield ----------------------- */
-function blackHoleScene() {
-  const stars = Array.from({ length: 240 }, () => ({
+/* MyWorld: black hole with accretion disk + starfield ------------------------- */
+interface Star {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+  readonly phase: number;
+}
+
+interface DiskParticle {
+  readonly r: number;
+  a: number;
+  readonly speed: number;
+  readonly size: number;
+  readonly color: string;
+  readonly alpha: number;
+}
+
+function blackHoleScene(): Scene {
+  const stars: Star[] = Array.from({ length: 240 }, () => ({
     x: Math.random(),
     y: Math.random(),
     z: Math.random() * 0.9 + 0.1,
     phase: Math.random() * TAU,
   }));
-  const disk = Array.from({ length: 900 }, () => {
+  const disk: DiskParticle[] = Array.from({ length: 900 }, () => {
     const r = 1.3 + Math.pow(Math.random(), 1.7) * 2.5;
     const heat = clamp(1 - (r - 1.3) / 2.5);
     return {
@@ -84,10 +125,10 @@ function blackHoleScene() {
     };
   });
 
-  function drawDisk(c, cx, cy, R, tilt, front) {
+  function drawDisk(c: CanvasRenderingContext2D, cx: number, cy: number, R: number, tilt: number, front: boolean): void {
     for (const p of disk) {
       const s = Math.sin(p.a);
-      if ((s > 0) !== front) continue;
+      if (s > 0 !== front) continue;
       const x = cx + Math.cos(p.a) * p.r * R;
       const y = cy + s * p.r * R * tilt;
       const doppler = 0.55 + 0.45 * Math.cos(p.a + 0.6);
@@ -160,56 +201,69 @@ function blackHoleScene() {
   };
 }
 
-/* Brasil Panel: streaming series + request log ------------------------------ */
-const ENDPOINTS = [
+/* Brasil Panel: streaming series + request log -------------------------------- */
+const ENDPOINTS: readonly string[] = [
   '/api/bcb/selic', '/api/quote/PETR4', '/api/ibge/estados', '/api/ipea/series',
   '/api/coingecko/btc', '/api/frankfurter/usd', '/api/worldbank/gdp', '/api/banks',
   '/api/viacep/01310100', '/api/metals/gold', '/api/auth/me',
 ];
+const SERIES_POINTS = 120;
+const STEP_MS = 110;
+const LOG_LINES = 4;
 
-function marketScene(_, host) {
-  const N = 120;
-  const STEP_MS = 110;
-  const series = [
-    { color: () => getAccent().hex, vol: 0.022, v: 0.55 },
-    { color: () => '#ffb547', vol: 0.03, v: 0.42 },
-    { color: () => '#42e2ff', vol: 0.018, v: 0.3 },
-  ].map((s) => {
-    const data = [];
-    let v = s.v;
-    for (let i = 0; i < N; i++) {
-      v = clamp(v + (Math.random() - 0.5) * s.vol * 2 + (0.5 - v) * 0.015, 0.1, 0.9);
-      data.push(v);
-    }
-    return { ...s, data, v };
-  });
+interface Series {
+  readonly color: () => string;
+  readonly vol: number;
+  readonly data: number[];
+  v: number;
+}
+
+const randomWalk = (v: number, vol: number): number => clamp(v + (Math.random() - 0.5) * vol * 2 + (0.5 - v) * 0.015, 0.1, 0.9);
+
+function createSeries(color: () => string, vol: number, start: number): Series {
+  const data: number[] = [];
+  let v = start;
+  for (let i = 0; i < SERIES_POINTS; i++) {
+    v = randomWalk(v, vol);
+    data.push(v);
+  }
+  return { color, vol, data, v };
+}
+
+function marketScene(host: HTMLElement): Scene {
+  const series: Series[] = [
+    createSeries(() => getAccent().hex, 0.022, 0.55),
+    createSeries(() => '#ffb547', 0.03, 0.42),
+    createSeries(() => '#42e2ff', 0.018, 0.3),
+  ];
   let acc = 0;
-
-  const log = host.querySelector('[data-log]');
+  const log = host.querySelector<HTMLElement>('[data-log]');
   let logTimer = 0;
-  const pushLog = () => {
+
+  const pushLog = (): void => {
     if (!log) return;
-    const path = ENDPOINTS[(Math.random() * ENDPOINTS.length) | 0];
+    const path = ENDPOINTS[Math.floor(Math.random() * ENDPOINTS.length)] ?? '/api';
     const hit = Math.random() > 0.3;
-    const ms = hit ? 1 + ((Math.random() * 6) | 0) : 40 + ((Math.random() * 180) | 0);
+    const ms = hit ? 1 + Math.floor(Math.random() * 6) : 40 + Math.floor(Math.random() * 180);
     const row = document.createElement('div');
     row.innerHTML = `<span class="m">GET</span><span class="p"></span><span class="s">200</span><span class="h">${hit ? 'cache:HIT ' : 'cache:MISS'}</span><span>${String(ms).padStart(3, ' ')}ms</span>`;
-    row.querySelector('.p').textContent = path;
+    const pathEl = row.querySelector('.p');
+    if (pathEl) pathEl.textContent = path;
     log.append(row);
-    while (log.children.length > 4) log.firstElementChild.remove();
+    while (log.children.length > LOG_LINES) log.firstElementChild?.remove();
   };
 
   return {
     setActive(active) {
-      clearInterval(logTimer);
-      if (active) logTimer = setInterval(pushLog, 900);
+      window.clearInterval(logTimer);
+      if (active) logTimer = window.setInterval(pushLog, 900);
     },
     draw({ ctx: c, w, h }, pointer, time, dt) {
       acc += dt;
       while (acc > STEP_MS) {
         acc -= STEP_MS;
         series.forEach((s) => {
-          s.v = clamp(s.v + (Math.random() - 0.5) * s.vol * 2 + (0.5 - s.v) * 0.015, 0.1, 0.9);
+          s.v = randomWalk(s.v, s.vol);
           s.data.push(s.v);
           s.data.shift();
         });
@@ -217,8 +271,9 @@ function marketScene(_, host) {
       const frac = acc / STEP_MS;
       const top = 44;
       const bottom = h * 0.62;
-      const step = w / (N - 2);
+      const step = w / (SERIES_POINTS - 2);
       const accentRgb = getAccent().rgb;
+      const toY = (v: number): number => bottom - v * (bottom - top);
 
       c.fillStyle = '#020303';
       c.fillRect(0, 0, w, h);
@@ -240,7 +295,6 @@ function marketScene(_, host) {
         c.stroke();
       }
 
-      const toY = (v) => bottom - v * (bottom - top);
       series.forEach((s, si) => {
         const color = s.color();
         c.beginPath();
@@ -256,7 +310,7 @@ function marketScene(_, host) {
         c.stroke();
         c.shadowBlur = 0;
         if (si === 0) {
-          c.lineTo((N - 1 - frac) * step, bottom);
+          c.lineTo((SERIES_POINTS - 1 - frac) * step, bottom);
           c.lineTo(-frac * step, bottom);
           c.closePath();
           const fill = c.createLinearGradient(0, top, 0, bottom);
@@ -265,11 +319,10 @@ function marketScene(_, host) {
           c.fillStyle = fill;
           c.fill();
         }
-        const lastX = (N - 1 - frac) * step;
-        const lastY = toY(s.data[N - 1]);
+        const last = s.data[SERIES_POINTS - 1] ?? 0.5;
         c.fillStyle = color;
         c.beginPath();
-        c.arc(lastX, lastY, 2.5 + Math.sin(time * 0.006 + si) * 0.8, 0, TAU);
+        c.arc((SERIES_POINTS - 1 - frac) * step, toY(last), 2.5 + Math.sin(time * 0.006 + si) * 0.8, 0, TAU);
         c.fill();
       });
 
@@ -282,13 +335,13 @@ function marketScene(_, host) {
         c.lineTo(x, bottom);
         c.stroke();
         c.setLineDash([]);
-        const idx = clamp(Math.round(x / step + frac), 0, N - 1);
+        const idx = clamp(Math.round(x / step + frac), 0, SERIES_POINTS - 1);
         series.forEach((s) => {
           c.fillStyle = '#020303';
           c.strokeStyle = s.color();
           c.lineWidth = 1.5;
           c.beginPath();
-          c.arc((idx - frac) * step, toY(s.data[idx]), 4, 0, TAU);
+          c.arc((idx - frac) * step, toY(s.data[idx] ?? 0.5), 4, 0, TAU);
           c.fill();
           c.stroke();
         });
@@ -297,11 +350,13 @@ function marketScene(_, host) {
   };
 }
 
-const SCENES = { blackhole: blackHoleScene, market: marketScene };
+const SCENES: Readonly<Record<VisualKind, SceneFactory>> = { blackhole: blackHoleScene, market: marketScene };
 
-export function initVisuals(root = document) {
-  root.querySelectorAll('[data-visual]').forEach((host) => {
-    const create = SCENES[host.dataset.visual];
-    if (create) mountScene(host, create);
+const isVisualKind = (value: string | undefined): value is VisualKind => value === 'blackhole' || value === 'market';
+
+export function initVisuals(root: ParentNode = document): void {
+  root.querySelectorAll<HTMLElement>('[data-visual]').forEach((host) => {
+    const kind = host.dataset.visual;
+    if (isVisualKind(kind)) mountScene(host, SCENES[kind]);
   });
 }

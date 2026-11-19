@@ -1,45 +1,56 @@
 # Portfólio · Jailton Santos
 
-Portfólio com tema de terminal, feito em HTML, CSS e JavaScript puro (ES modules, sem build e sem dependências).
+Portfólio full-stack com tema de terminal: retrato em ASCII com lente que revela a foto, shell interativo (`jsh`), visuais ao vivo dos projetos e animações guiadas pelo scroll.
+
+**Stack:** TypeScript (strict) · Vite · GSAP (ScrollTrigger + SplitText) · Lenis · Vitest
 
 ## Rodar localmente
 
-ES modules não funcionam abrindo o `index.html` direto (file://). Sirva a pasta:
-
 ```powershell
-python -m http.server 5179
+npm install
+npm run dev
 ```
 
-e abra http://localhost:5179.
+| Script | O que faz |
+|---|---|
+| `npm run dev` | servidor de desenvolvimento com hot reload |
+| `npm run build` | checa os tipos (`tsc`) e gera o site em `dist/` |
+| `npm run preview` | serve o build de produção |
+| `npm test` | testes unitários (Vitest) |
+| `npm run coverage` | testes com relatório de cobertura |
 
 ## Onde editar
 
 | O quê | Arquivo |
 |---|---|
-| Nome, links, **e-mail e LinkedIn** (estão vazios) | `js/data.js` → `profile` |
-| Projetos (MyWorld, Brasil Panel) | `js/data.js` → `projects` |
-| Stack | `js/data.js` → `stack` |
-| Rótulos que orbitam o retrato | `js/data.js` → `arcs` |
-| Foto | `assets/jailton.jpg` (720×819) |
-| Cores / tokens | `css/base.css` → `:root` |
+| Nome, e-mail, links, LinkedIn | `src/data/content.ts` → `profile` |
+| Projetos (MyWorld, Brasil Panel) | `src/data/content.ts` → `projects` |
+| Stack | `src/data/content.ts` → `stack` |
+| Rótulos que orbitam o retrato | `src/data/content.ts` → `arcs` |
+| Foto | `src/assets/jailton.jpg` (720×819) |
+| Cores / tokens | `src/styles/base.css` → `:root` |
 
 O terminal (`help`, `neofetch`, `projetos`, `abrir`, `theme`, `matrix`…) lê os mesmos dados, então tudo fica sincronizado.
 
 ## Estrutura
 
 ```
-index.html
-css/base.css        tokens, botões, nav, cursor, boot, statusline
-css/sections.css    hero, retrato, projetos, terminal, stack, contato
-js/main.js          ponto de entrada
-js/portrait.js      retrato em ASCII + lente que revela a foto
-js/visuals.js       buraco negro (MyWorld) e gráfico ao vivo (Brasil Panel)
-js/terminal.js      o shell "jsh"
-js/effects.js       cursor, parallax, botões magnéticos, reveals
-js/render.js        renderiza projetos/stack/contato a partir de data.js
+src/
+  main.ts               ponto de entrada
+  types.ts              tipos do conteúdo (Profile, Project, StackGroup…)
+  data/content.ts       todo o conteúdo do site
+  anim/motion.ts        Lenis + GSAP: entrada, reveals, parallax, texto por scroll
+  ui/                   render dos dados, efeitos (cursor, magnetic, tilt), boot
+  portrait/             retrato ASCII (ascii.ts é a matemática pura, testada)
+  visuals/visuals.ts    buraco negro (MyWorld) e gráfico ao vivo (Brasil Panel)
+  terminal/             o shell jsh (shell-utils.ts tem a lógica pura, testada)
+  lib/                  helpers (math, text, dom, ticker, theme)
+  styles/               base.css e sections.css
 ```
 
 ## Deploy
 
-É um site estático: funciona no GitHub Pages, Vercel, Netlify ou S3 + CloudFront sem configuração.
-Respeita `prefers-reduced-motion` (desliga boot, glitch e animações pesadas).
+Cada push na `main` roda `.github/workflows/deploy.yml`: instala, testa, builda e publica `dist/` no GitHub Pages.
+Para ativar, em **Settings → Pages → Build and deployment**, escolha **GitHub Actions** como source.
+
+O site respeita `prefers-reduced-motion`: sem boot, sem smooth scroll e sem animações pesadas.

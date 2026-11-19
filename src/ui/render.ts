@@ -1,8 +1,9 @@
-// Renders data-driven parts of the page (projects, stack, contact, hero arcs) from data.js.
-import { projects, stack, profile, arcs } from './data.js';
-import { esc, safeUrl } from './core.js';
+// Renders the data-driven parts of the page (projects, stack, contact, hero arcs).
+import { arcs, profile, projects, stack } from '../data/content';
+import { esc, safeUrl } from '../lib/text';
+import type { Project, VisualKind } from '../types';
 
-const VISUAL_OVERLAYS = {
+const VISUAL_OVERLAYS: Readonly<Record<VisualKind, () => string>> = {
   blackhole: () => '<div class="viz-tag"><b>nasa apod</b> · 1995 → hoje · ia</div>',
   market: () => `
     <div class="viz-legend">
@@ -13,7 +14,7 @@ const VISUAL_OVERLAYS = {
     <div class="viz-log" data-log aria-hidden="true"></div>`,
 };
 
-function linkButton(url, label, isPrimary) {
+function linkButton(url: string, label: string, isPrimary: boolean): string {
   const href = safeUrl(url);
   if (!href) return '';
   const variant = isPrimary ? 'btn--primary' : 'btn--ghost';
@@ -22,8 +23,7 @@ function linkButton(url, label, isPrimary) {
     </a>`;
 }
 
-function projectTemplate(p) {
-  const overlay = VISUAL_OVERLAYS[p.visual]?.() ?? '';
+function projectTemplate(p: Project): string {
   return `
   <article class="project" id="p-${esc(p.id)}" data-reveal>
     <div class="project__window" data-spotlight data-tilt>
@@ -34,7 +34,7 @@ function projectTemplate(p) {
       </div>
       <div class="project__visual" data-visual="${esc(p.visual)}">
         <canvas aria-hidden="true"></canvas>
-        ${overlay}
+        ${VISUAL_OVERLAYS[p.visual]()}
       </div>
     </div>
     <div class="project__body">
@@ -52,12 +52,11 @@ function projectTemplate(p) {
   </article>`;
 }
 
-export function renderProjects(container) {
-  if (!container) return;
-  container.innerHTML = projects.map(projectTemplate).join('');
+export function renderProjects(container: HTMLElement | null): void {
+  if (container) container.innerHTML = projects.map(projectTemplate).join('');
 }
 
-export function renderStack(container) {
+export function renderStack(container: HTMLElement | null): void {
   if (!container) return;
   container.innerHTML = stack
     .map(
@@ -82,7 +81,7 @@ export function renderStack(container) {
     .join('');
 }
 
-function linkRow(key, value, url, action) {
+function linkRow(key: string, value: string, url: string, action: string): string {
   const href = safeUrl(url);
   if (!href) return '';
   return `<a class="c-row" href="${esc(href)}" target="_blank" rel="noopener noreferrer">
@@ -92,9 +91,9 @@ function linkRow(key, value, url, action) {
     </a>`;
 }
 
-export function renderContact(container) {
+export function renderContact(container: HTMLElement | null): void {
   if (!container) return;
-  const rows = [];
+  const rows: string[] = [];
   if (profile.email) {
     rows.push(`<button class="c-row" type="button" data-copy="${esc(profile.email)}">
         <span class="c-row__k">e-mail</span>
@@ -112,11 +111,16 @@ export function renderContact(container) {
   container.innerHTML = rows.join('');
 }
 
+interface Point {
+  readonly x: number;
+  readonly y: number;
+}
+
 /** SVG arcs that orbit the portrait, drawn in on load (see .arc-* in sections.css). */
-export function renderArcs(container) {
+export function renderArcs(container: HTMLElement | null): void {
   if (!container) return;
-  const center = { x: -250, y: 350 };
-  const point = (r, deg) => {
+  const center: Point = { x: -250, y: 350 };
+  const point = (r: number, deg: number): Point => {
     const a = (deg * Math.PI) / 180;
     return { x: +(center.x + r * Math.cos(a)).toFixed(2), y: +(center.y + r * Math.sin(a)).toFixed(2) };
   };

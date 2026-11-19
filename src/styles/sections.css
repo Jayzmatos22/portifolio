@@ -227,13 +227,13 @@
 }
 .project:nth-child(even) .project__window { order: 2; }
 .project__window {
-  --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%;
+  --mx: 50%; --my: 50%;
   position: relative;
   border: 1px solid var(--line-2); border-radius: 12px;
   background: var(--bg-1);
   overflow: hidden;
-  transform: perspective(1400px) rotateX(var(--rx)) rotateY(var(--ry));
-  transition: transform .7s var(--ease-out), box-shadow .5s;
+  /* 3D tilt is applied by GSAP (rotationX/rotationY) */
+  transition: box-shadow .5s;
   box-shadow: 0 50px 100px -50px rgba(0, 0, 0, 1);
 }
 .project__window::before { /* lit border following the cursor */

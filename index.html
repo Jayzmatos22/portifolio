@@ -9,17 +9,14 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Jailton Santos — Desenvolvedor Full-stack">
   <meta property="og:description" content="Full-stack com foco em back-end: APIs em Java e Python, React, integrações, cache, autenticação e deploy em nuvem.">
-  <meta property="og:image" content="assets/jailton.jpg">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23020303'/%3E%3Crect x='11' y='8' width='8' height='16' fill='%233dff7a'/%3E%3C/svg%3E">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300..800;1,400&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/sections.css">
   <script>document.documentElement.classList.add('js')</script>
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="/src/main.ts"></script>
 </head>
 <body>
   <a class="skip" href="#sobre">Pular para o conteúdo</a>
@@ -55,7 +52,7 @@
     </nav>
   </header>
 
-  <div class="menu" id="menu">
+  <div class="menu" id="menu" data-lenis-prevent>
     <nav class="menu__links" aria-label="Menu">
       <a href="#sobre"><span>01</span>sobre</a>
       <a href="#projetos"><span>02</span>projetos</a>
@@ -108,7 +105,7 @@
 
         <figure class="portrait rise" id="portrait" style="--d:.3s" data-cursor-hide>
           <div class="portrait__frame">
-            <img class="portrait__photo" src="assets/jailton.jpg" alt="Retrato de Jailton Santos" width="720" height="819" fetchpriority="high">
+            <img class="portrait__photo" src="/src/assets/jailton.jpg" alt="Retrato de Jailton Santos" width="720" height="819" fetchpriority="high">
             <canvas class="portrait__ascii" aria-hidden="true"></canvas>
             <div class="portrait__lens" aria-hidden="true"><span class="lens__label">foto real</span></div>
             <div class="portrait__hud portrait__hud--top" aria-hidden="true">
@@ -192,7 +189,7 @@
           <span class="term__title">visitante@jailton: ~</span>
           <span class="term__size" aria-hidden="true">jsh · utf-8</span>
         </div>
-        <div class="term__screen" id="termScreen">
+        <div class="term__screen" id="termScreen" data-lenis-prevent>
           <div class="term__out" role="log" aria-live="polite" aria-label="Saída do terminal"></div>
           <form class="term__form" autocomplete="off">
             <label class="t-prompt" for="termInput"><b>visitante@jailton</b>:<i>~</i>$</label>

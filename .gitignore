@@ -6,3 +6,8 @@
 # Sistema
 Thumbs.db
 .DS_Store
+
+# Build e dependências
+node_modules/
+dist/
+coverage/
