@@ -10,6 +10,16 @@ export interface Profile {
   readonly linkedinLabel: string;
 }
 
+export interface Education {
+  readonly course: string;
+  /** e.g. "Tecnólogo", "Bacharelado". */
+  readonly degree: string;
+  readonly institution: string;
+  /** Completion month (expected or actual), formatted YYYY-MM. */
+  readonly completion: string;
+  readonly inProgress: boolean;
+}
+
 export type VisualKind = 'blackhole' | 'market';
 
 export interface ProjectLinks {

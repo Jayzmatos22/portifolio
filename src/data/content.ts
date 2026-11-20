@@ -1,5 +1,5 @@
 // Single source of truth for the page and the terminal. Edit here.
-import type { OrbitArc, Profile, Project, StackGroup, VirtualFiles } from '../types';
+import type { Education, OrbitArc, Profile, Project, StackGroup, VirtualFiles } from '../types';
 
 export const profile: Profile = {
   name: 'Jailton Santos',
@@ -13,6 +13,16 @@ export const profile: Profile = {
   linkedin: '',
   linkedinLabel: '',
 };
+
+export const education: readonly Education[] = [
+  {
+    course: 'Análise e Desenvolvimento de Sistemas',
+    degree: 'Tecnólogo',
+    institution: 'Unisa',
+    completion: '2027-07',
+    inProgress: true,
+  },
+];
 
 export const projects: readonly Project[] = [
   {

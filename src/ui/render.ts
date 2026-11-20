@@ -1,6 +1,6 @@
 // Renders the data-driven parts of the page (projects, stack, contact, hero arcs).
-import { arcs, profile, projects, stack } from '../data/content';
-import { esc, safeUrl } from '../lib/text';
+import { arcs, education, profile, projects, stack } from '../data/content';
+import { completionLabel, esc, safeUrl } from '../lib/text';
 import type { Project, VisualKind } from '../types';
 
 const VISUAL_OVERLAYS: Readonly<Record<VisualKind, () => string>> = {
@@ -54,6 +54,17 @@ function projectTemplate(p: Project): string {
 
 export function renderProjects(container: HTMLElement | null): void {
   if (container) container.innerHTML = projects.map(projectTemplate).join('');
+}
+
+/** Fills the "formação" fact in the about section (static HTML is the no-JS fallback). */
+export function renderEducation(container: HTMLElement | null): void {
+  if (!container) return;
+  container.innerHTML = education
+    .map(
+      (e) =>
+        `<span>${esc(e.course)} · ${esc(e.institution)}</span><span class="fact__meta">${esc(completionLabel(e.completion, e.inProgress))}</span>`,
+    )
+    .join('');
 }
 
 export function renderStack(container: HTMLElement | null): void {

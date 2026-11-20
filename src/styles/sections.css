@@ -217,7 +217,14 @@
 }
 .fact:hover { padding-left: 10px; background: linear-gradient(90deg, rgba(var(--accent-rgb), .05), transparent); }
 .fact dt { color: var(--dim); }
-.fact dd { display: flex; align-items: center; gap: 9px; color: var(--text-2); }
+.fact dd { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 9px; color: var(--text-2); }
+.fact__meta {
+  padding: 2px 8px;
+  font-size: 10.5px; letter-spacing: .04em; white-space: nowrap;
+  color: var(--accent);
+  border: 1px solid rgba(var(--accent-rgb), .35); border-radius: 999px;
+  background: rgba(var(--accent-rgb), .05);
+}
 
 /* Projects -------------------------------------------------------------------- */
 .projects { display: flex; flex-direction: column; gap: clamp(96px, 13vw, 180px); }
