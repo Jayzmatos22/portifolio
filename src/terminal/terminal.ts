@@ -34,6 +34,7 @@ const SECTIONS: Readonly<Record<string, string>> = {
 const ALIASES: AliasMap = {
   ajuda: 'help', '?': 'help', cls: 'clear', projects: 'projetos', about: 'sobre', contact: 'contato', open: 'abrir', hire: 'contratar', ll: 'ls',
   education: 'formacao', 'formação': 'formacao', faculdade: 'formacao',
+  telas: 'galeria', screens: 'galeria', gallery: 'galeria',
 };
 const CODE_WORDS = ['codigo', 'código', 'repo', 'code'];
 const PROMPT_HTML = '<span class="t-prompt"><b>visitante@jailton</b>:<i>~</i>$</span> ';
@@ -153,6 +154,21 @@ export function initTerminal(root: HTMLElement | null, options: TerminalOptions 
         const wantsCode = CODE_WORDS.includes((args[1] ?? '').toLowerCase());
         const url = !wantsCode && project.links.live ? project.links.live : project.links.repo;
         print(openUrl(url) ? `<span class="t-acc">→</span> abrindo ${link(url, url)}` : '<span class="t-red">sem link disponível</span>');
+      },
+    },
+    galeria: {
+      desc: 'abre a galeria de telas de um projeto',
+      usage: '<projeto>',
+      args: () => projects.filter((p) => p.screens.length).map((p) => p.id),
+      run: (args) => {
+        const project = projects.find((p) => p.id === (args[0] ?? '').toLowerCase());
+        if (!project?.screens.length) {
+          print(`<span class="t-red">uso:</span> galeria &lt;${projects.map((p) => esc(p.id)).join('|')}&gt;`);
+          return;
+        }
+        const devices = [...new Set(project.screens.map((s) => s.device))].join(', ');
+        print(`<span class="t-acc">→</span> ${project.screens.length} telas de ${esc(project.name)} <span class="t-dim">(${esc(devices)})</span>`);
+        scrollToId(`g-${project.id}`);
       },
     },
     stack: {
