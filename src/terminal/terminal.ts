@@ -1,10 +1,10 @@
 // "jsh": a small hand-made shell. User input is only ever rendered with textContent;
 // command output templates are static and escape every interpolated value.
 import { scrollToId } from '../anim/motion';
-import { files, profile, projects, stack } from '../data/content';
+import { education, files, profile, projects, stack } from '../data/content';
 import { prefersReducedMotion, watchVisibility } from '../lib/dom';
 import { wait } from '../lib/math';
-import { esc, safeUrl } from '../lib/text';
+import { completionLabel, esc, formatMonthYear, safeUrl } from '../lib/text';
 import { accentNames, getAccentName, setAccent } from '../lib/theme';
 import { asciiLines } from '../portrait/portrait';
 import type { EditorMode } from '../ui/effects';
@@ -33,6 +33,7 @@ const SECTIONS: Readonly<Record<string, string>> = {
 };
 const ALIASES: AliasMap = {
   ajuda: 'help', '?': 'help', cls: 'clear', projects: 'projetos', about: 'sobre', contact: 'contato', open: 'abrir', hire: 'contratar', ll: 'ls',
+  education: 'formacao', 'formação': 'formacao', faculdade: 'formacao',
 };
 const CODE_WORDS = ['codigo', 'código', 'repo', 'code'];
 const PROMPT_HTML = '<span class="t-prompt"><b>visitante@jailton</b>:<i>~</i>$</span> ';
@@ -118,6 +119,9 @@ export function initTerminal(root: HTMLElement | null, options: TerminalOptions 
           `<span class="t-strong">${esc(profile.name)}</span> <span class="t-dim">(${esc(profile.user)})</span>`,
           `${esc(profile.role)} <span class="t-dim">· foco em back-end</span>`,
           'java · python · typescript · react · aws',
+          ...education.map(
+            (e) => `<span class="t-dim">formação:</span> ${esc(e.course)} · ${esc(e.institution)} <span class="t-dim">(${esc(completionLabel(e.completion, e.inProgress))})</span>`,
+          ),
           `<span class="t-acc">●</span> ${esc(profile.status)}`,
         ]),
     },
@@ -177,6 +181,16 @@ export function initTerminal(root: HTMLElement | null, options: TerminalOptions 
         return printAll(rows.filter(Boolean));
       },
     },
+    formacao: {
+      desc: 'formação acadêmica',
+      run: () =>
+        printAll(
+          education.flatMap((e) => [
+            `<span class="t-strong">${esc(e.course)}</span> <span class="t-dim">(${esc(e.degree.toLowerCase())})</span>`,
+            `${esc(e.institution)} · ${e.inProgress ? '<span class="t-acc">●</span> cursando · ' : ''}${esc(completionLabel(e.completion, e.inProgress))}`,
+          ]),
+        ),
+    },
     github: {
       desc: 'abre meu github',
       run: () => {
@@ -193,6 +207,7 @@ export function initTerminal(root: HTMLElement | null, options: TerminalOptions 
           ['Host', window.location.host || 'localhost'],
           ['Shell', 'jsh 2.0'],
           ['Função', `${profile.role} (foco em back-end)`],
+          ...education.map((e) => ['Formação', `${e.course} · ${e.institution} (${formatMonthYear(e.completion)})`]),
           ['Linguagens', 'Java, Python, TypeScript'],
           ['Back-end', 'Spring Boot, FastAPI'],
           ['Front-end', 'React, TypeScript, Tailwind'],

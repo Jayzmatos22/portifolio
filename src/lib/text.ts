@@ -15,7 +15,21 @@ export const safeUrl = (url: string | null | undefined): string => {
   return /^(https?:|mailto:)/i.test(value) ? value : '';
 };
 
-export const SCRAMBLE_GLYPHS = '!<>-_\\/[]{}=+*^?#01$%';
+const MONTHS_PT = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'] as const;
+
+/** '2027-07' -> 'jul/2027'. Anything that is not a valid YYYY-MM is returned unchanged. */
+export function formatMonthYear(value: string): string {
+  const match = /^(\d{4})-(\d{2})$/.exec(value);
+  if (!match) return value;
+  const month = MONTHS_PT[Number(match[2]) - 1];
+  return month ? `${month}/${match[1]}` : value;
+}
+
+/** "previsão jul/2027" for a course in progress, "concluído em dez/2024" otherwise. */
+export const completionLabel = (completion: string, inProgress: boolean): string =>
+  `${inProgress ? 'previsão' : 'concluído em'} ${formatMonthYear(completion)}`;
+
+export const SCRAMBLE_GLYPHS ='!<>-_\\/[]{}=+*^?#01$%';
 
 /**
  * One frame of a "decode" effect: characters left of `progress` are final,

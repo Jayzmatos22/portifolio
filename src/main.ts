@@ -23,7 +23,7 @@ import {
   setStatus,
   splitWords,
 } from './ui/effects';
-import { renderArcs, renderContact, renderProjects, renderStack } from './ui/render';
+import { renderArcs, renderContact, renderEducation, renderProjects, renderStack } from './ui/render';
 import { initVisuals } from './visuals/visuals';
 
 function initShortcuts(terminal: TerminalController): void {
@@ -56,6 +56,7 @@ function main(): void {
   renderStack(document.getElementById('stackGrid'));
   renderContact(document.getElementById('contactRows'));
   renderArcs(document.getElementById('arcs'));
+  renderEducation(document.querySelector<HTMLElement>('[data-education]'));
 
   const lede = document.querySelector<HTMLElement>('[data-words]');
   const words = splitWords(lede);

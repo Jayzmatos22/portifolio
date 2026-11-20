@@ -1,5 +1,28 @@
 import { describe, expect, it } from 'vitest';
-import { esc, safeUrl, scrambleText, SCRAMBLE_GLYPHS } from './text';
+import { completionLabel, esc, formatMonthYear, safeUrl, scrambleText, SCRAMBLE_GLYPHS } from './text';
+
+describe('formatMonthYear', () => {
+  it('formats YYYY-MM as a short Portuguese month and year', () => {
+    expect(formatMonthYear('2027-07')).toBe('jul/2027');
+    expect(formatMonthYear('2026-12')).toBe('dez/2026');
+    expect(formatMonthYear('2025-01')).toBe('jan/2025');
+  });
+
+  it('returns the input unchanged when it is not a valid YYYY-MM', () => {
+    expect(formatMonthYear('2027-13')).toBe('2027-13');
+    expect(formatMonthYear('julho')).toBe('julho');
+  });
+});
+
+describe('completionLabel', () => {
+  it('describes an expected completion for a course in progress', () => {
+    expect(completionLabel('2027-07', true)).toBe('previsão jul/2027');
+  });
+
+  it('describes a finished course', () => {
+    expect(completionLabel('2024-12', false)).toBe('concluído em dez/2024');
+  });
+});
 
 describe('esc', () => {
   it('escapes every HTML-significant character', () => {
