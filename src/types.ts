@@ -22,6 +22,19 @@ export interface Education {
 
 export type VisualKind = 'blackhole' | 'market';
 
+export type DeviceKind = 'desktop' | 'tablet' | 'mobile';
+
+export interface Screenshot {
+  /** Image URL (imported through Vite so it gets hashed and optimized). */
+  readonly src: string;
+  readonly title: string;
+  readonly caption: string;
+  readonly device: DeviceKind;
+  /** Intrinsic size in px, used to keep the aspect ratio while laying out the gallery. */
+  readonly width: number;
+  readonly height: number;
+}
+
 export interface ProjectLinks {
   /** Public URL of the running app; empty when there is none. */
   readonly live: string;
@@ -39,6 +52,7 @@ export interface Project {
   readonly stack: readonly string[];
   readonly links: ProjectLinks;
   readonly visual: VisualKind;
+  readonly screens: readonly Screenshot[];
 }
 
 /** [technology, where it was used] */

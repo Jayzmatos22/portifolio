@@ -1,4 +1,15 @@
 // Single source of truth for the page and the terminal. Edit here.
+import bpBalanca from '../assets/projects/brasilpanel/balanca.webp';
+import bpComparativo from '../assets/projects/brasilpanel/comparativo.webp';
+import bpCripto from '../assets/projects/brasilpanel/cripto.webp';
+import bpFiscais from '../assets/projects/brasilpanel/fiscais.webp';
+import bpLanding from '../assets/projects/brasilpanel/landing.webp';
+import bpMetais from '../assets/projects/brasilpanel/metais.webp';
+import myworldAcaso from '../assets/projects/myworld/acaso.webp';
+import myworldFavoritos from '../assets/projects/myworld/favoritos.webp';
+import myworldGaleria from '../assets/projects/myworld/galeria.webp';
+import myworldHome from '../assets/projects/myworld/home.webp';
+import myworldPlaca from '../assets/projects/myworld/placa.webp';
 import type { Education, OrbitArc, Profile, Project, StackGroup, VirtualFiles } from '../types';
 
 export const profile: Profile = {
@@ -42,6 +53,13 @@ export const projects: readonly Project[] = [
     stack: ['Python 3.13', 'FastAPI', 'Pydantic v2', 'AWS Lambda', 'DynamoDB', 'S3 + CloudFront', 'AWS SAM', 'React 19', 'TypeScript', 'WebGL'],
     links: { live: 'https://d3qm8fzq1hw1xt.cloudfront.net/', repo: 'https://github.com/Jayzmatos22/MyWorld' },
     visual: 'blackhole',
+    screens: [
+      { src: myworldHome, title: 'Página inicial', caption: 'O céu de cada dia, guardado desde 1995', device: 'desktop', width: 1600, height: 753 },
+      { src: myworldPlaca, title: 'Placa do dia', caption: 'APOD com data, navegação entre noites e a imagem em destaque', device: 'desktop', width: 1600, height: 751 },
+      { src: myworldGaleria, title: 'Galeria por intervalo', caption: 'Até 31 noites lado a lado, como num catálogo de observatório', device: 'tablet', width: 852, height: 1598 },
+      { src: myworldFavoritos, title: 'Favoritos', caption: 'Ranking das placas mais curtidas pela comunidade', device: 'tablet', width: 852, height: 1600 },
+      { src: myworldAcaso, title: 'Ao acaso', caption: 'Oito placas sorteadas de trinta anos de céu', device: 'mobile', width: 720, height: 1363 },
+    ],
   },
   {
     id: 'brasilpanel',
@@ -60,6 +78,14 @@ export const projects: readonly Project[] = [
     stack: ['Java 21', 'Spring Boot 3.5', 'Spring Security', 'JPA / Hibernate', 'PostgreSQL', 'Caffeine', 'Docker', 'React 19', 'TanStack Query'],
     links: { live: '', repo: 'https://github.com/Jayzmatos22/brasil_panel_utilities-api' },
     visual: 'market',
+    screens: [
+      { src: bpLanding, title: 'Landing page', caption: 'Os dados que movem o Brasil, em um só painel', device: 'desktop', width: 1600, height: 751 },
+      { src: bpFiscais, title: 'Indicadores fiscais', caption: 'Arrecadação federal por tributo · IPEA e Receita Federal', device: 'desktop', width: 1600, height: 754 },
+      { src: bpBalanca, title: 'Balança de pagamentos', caption: 'De onde vem o saldo em transações correntes · IPEA e BACEN', device: 'tablet', width: 900, height: 1207 },
+      { src: bpComparativo, title: 'Exportações', caption: 'Comparativo de 11 séries nos últimos 12 meses', device: 'tablet', width: 900, height: 1125 },
+      { src: bpCripto, title: 'Criptomoedas', caption: 'Top 100 por market cap · CoinGecko e CoinMarketCap', device: 'tablet', width: 900, height: 1207 },
+      { src: bpMetais, title: 'Metais preciosos', caption: 'Cotações em tempo real e fixing oficial LBMA', device: 'mobile', width: 720, height: 1341 },
+    ],
   },
 ];
 
