@@ -5,6 +5,9 @@ import bpCripto from '../assets/projects/brasilpanel/cripto.webp';
 import bpFiscais from '../assets/projects/brasilpanel/fiscais.webp';
 import bpLanding from '../assets/projects/brasilpanel/landing.webp';
 import bpMetais from '../assets/projects/brasilpanel/metais.webp';
+import myworldAcaso from '../assets/projects/myworld/acaso.webp';
+import myworldFavoritos from '../assets/projects/myworld/favoritos.webp';
+import myworldGaleria from '../assets/projects/myworld/galeria.webp';
 import myworldHome from '../assets/projects/myworld/home.webp';
 import myworldPlaca from '../assets/projects/myworld/placa.webp';
 import type { Education, OrbitArc, Profile, Project, StackGroup, VirtualFiles } from '../types';
@@ -53,6 +56,9 @@ export const projects: readonly Project[] = [
     screens: [
       { src: myworldHome, title: 'Página inicial', caption: 'O céu de cada dia, guardado desde 1995', device: 'desktop', width: 1600, height: 753 },
       { src: myworldPlaca, title: 'Placa do dia', caption: 'APOD com data, navegação entre noites e a imagem em destaque', device: 'desktop', width: 1600, height: 751 },
+      { src: myworldGaleria, title: 'Galeria por intervalo', caption: 'Até 31 noites lado a lado, como num catálogo de observatório', device: 'tablet', width: 852, height: 1598 },
+      { src: myworldFavoritos, title: 'Favoritos', caption: 'Ranking das placas mais curtidas pela comunidade', device: 'tablet', width: 852, height: 1600 },
+      { src: myworldAcaso, title: 'Ao acaso', caption: 'Oito placas sorteadas de trinta anos de céu', device: 'mobile', width: 720, height: 1363 },
     ],
   },
   {
