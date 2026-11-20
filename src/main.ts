@@ -2,8 +2,10 @@
 import 'lenis/dist/lenis.css';
 import './styles/base.css';
 import './styles/sections.css';
+import './styles/gallery.css';
 
 import { initParallax, initReveals, initSmoothScroll, initWordScrub, playIntro, refreshScroll } from './anim/motion';
+import { initGalleries } from './gallery/gallery';
 import { closestFromEvent } from './lib/dom';
 import { getAccentName, restoreAccent } from './lib/theme';
 import { initPortrait } from './portrait/portrait';
@@ -81,6 +83,7 @@ function main(): void {
   const portraitRoot = document.getElementById('portrait');
   const portrait = initPortrait(portraitRoot);
   initVisuals();
+  initGalleries();
   const terminal = initTerminal(document.getElementById('term'), {
     portraitImg: portraitRoot?.querySelector<HTMLImageElement>('.portrait__photo'),
     onModeChange: (mode) => setStatus({ mode }),

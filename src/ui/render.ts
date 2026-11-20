@@ -1,5 +1,6 @@
 // Renders the data-driven parts of the page (projects, stack, contact, hero arcs).
 import { arcs, education, profile, projects, stack } from '../data/content';
+import { galleryTemplate } from '../gallery/gallery';
 import { completionLabel, esc, safeUrl } from '../lib/text';
 import type { Project, VisualKind } from '../types';
 
@@ -47,8 +48,10 @@ function projectTemplate(p: Project): string {
       <div class="project__links">
         ${linkButton(p.links.live, 'ver no ar', true)}
         ${linkButton(p.links.repo, 'código', !p.links.live)}
+        ${p.screens.length ? `<a class="btn btn--ghost btn--sm" href="#g-${esc(p.id)}" data-magnetic=".2"><span>telas</span><span class="btn__arrow" aria-hidden="true">↓</span></a>` : ''}
       </div>
     </div>
+    ${galleryTemplate(p)}
   </article>`;
 }
 
