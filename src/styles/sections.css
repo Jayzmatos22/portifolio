@@ -36,7 +36,7 @@
   display: grid; grid-template-columns: minmax(0, 1fr) auto;
   align-items: end; gap: clamp(24px, 4vw, 72px);
 }
-.hero__copy { max-width: 660px; padding-bottom: 8px; }
+.hero__copy { max-width: 660px; padding-bottom: 8px; container-type: inline-size; }
 .eyebrow {
   display: flex; align-items: center; gap: 10px;
   margin-bottom: 26px;
@@ -46,7 +46,8 @@
   display: flex; flex-direction: column;
   margin-bottom: 28px;
   font-family: var(--font-display); font-weight: 700;
-  font-size: clamp(3.3rem, 9.4vw, 8.8rem);
+  /* Sized by the copy column (container query), so "JAILTON" always fits next to the portrait. */
+  font-size: clamp(3rem, 20cqi, 8.8rem);
   line-height: .88; letter-spacing: -.065em; text-transform: uppercase;
 }
 .hero__title .line { display: block; padding-right: .1em; }
@@ -477,7 +478,7 @@
 }
 @media (max-width: 640px) {
   .portrait__frame { --lr: 82px; height: auto; width: min(78vw, 340px); }
-  .hero__title { font-size: clamp(3rem, 16vw, 4.6rem); }
+  .hero__title { font-size: clamp(2.6rem, 20cqi, 4.6rem); }
   .section__cmd { font-size: 12px; }
   .term__screen { height: 62svh; padding: 16px 14px 22px; font-size: 12.5px; }
   .term__title { display: none; }

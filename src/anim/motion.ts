@@ -77,7 +77,8 @@ export function playIntro(): void {
 
   gsap.set(titleLines, { opacity: 1 });
   titleLines.forEach((line, i) => {
-    const split = SplitText.create(line, { type: 'chars', mask: 'chars', aria: 'auto' });
+    // "words,chars": letters sit inside a word wrapper, so a line can never break mid-word.
+    const split = SplitText.create(line, { type: 'words,chars', mask: 'chars', aria: 'auto' });
     tl.from(split.chars, { yPercent: 110, duration: 1.1, stagger: 0.035 }, 0.15 + i * 0.12);
   });
 
